@@ -12,7 +12,6 @@ This project analyzes a large e-commerce dataset using **Python** for data analy
 - Pandas, NumPy
 - Matplotlib, Seaborn
 - Power BI Desktop
-- Jupyter Notebook or VS Code
 
 ---
 
