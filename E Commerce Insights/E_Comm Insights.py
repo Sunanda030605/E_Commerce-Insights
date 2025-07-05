@@ -1,0 +1,85 @@
+import pandas as pd
+import matplotlib
+matplotlib.use('Agg') 
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+import calendar
+df = pd.read_csv("ecommerce_dataset_large.csv")
+df.columns = df.columns.str.strip().str.replace(" ", "_").str.replace("(", "").str.replace(")", "")
+df['Purchase_Date'] = pd.to_datetime(df['Purchase_Date'], dayfirst=True) 
+df['Hour'] = df['Purchase_Date'].dt.hour
+df['Date'] = df['Purchase_Date'].dt.date
+df['Month'] = df['Purchase_Date'].dt.month
+df['Day_Name'] = df['Purchase_Date'].dt.day_name()
+df['Revenue'] = df['Final_Price_Rs.']
+category_revenue = df.groupby('Category')['Revenue'].sum().sort_values(ascending=False).head(10)
+orders_by_hour = df.groupby('Hour').size()
+daily_revenue = df.groupby('Date')['Revenue'].sum()
+user_orders = df.groupby('User_ID').size()
+repeat_users = user_orders[user_orders > 1].count()
+total_users = df['User_ID'].nunique()
+retention_rate = (repeat_users / total_users) * 100
+plt.figure(figsize=(12, 6))
+sns.barplot(x=category_revenue.values, y=category_revenue.index, hue=category_revenue.index, dodge=False, palette="viridis", legend=False)
+plt.title("Top 10 Categories by Revenue")
+plt.xlabel("Revenue")
+plt.ylabel("Category")
+plt.tight_layout()
+plt.savefig("top_categories_revenue.png")
+plt.close()
+df['Hour'] = df['Purchase_Date'].dt.hour
+all_hours = pd.Series(range(24), name="Hour")
+hourly_orders = df['Hour'].value_counts().reindex(all_hours, fill_value=0).sort_index()
+plt.figure(figsize=(10, 5))
+sns.lineplot(x=hourly_orders.index, y=hourly_orders.values, marker='o', color='orange')
+plt.title("Order Volume by Hour")
+plt.xlabel("Hour of Day")
+plt.ylabel("Number of Orders")
+plt.xticks(range(0, 24))
+plt.tight_layout()
+plt.savefig("order_volume_by_hour.png")
+plt.close()
+plt.figure(figsize=(12, 5))
+daily_revenue.plot(kind='line', marker='o')
+plt.title("Daily Revenue Trend")
+plt.ylabel("Revenue")
+plt.xlabel("Date")
+plt.tight_layout()
+plt.savefig("daily_revenue_trend.png")
+plt.close()
+plt.figure(figsize=(8, 5))
+payment_counts = df['Payment_Method'].value_counts()
+plt.pie(payment_counts.values, labels=payment_counts.index, autopct='%1.1f%%', startangle=140, colors=sns.color_palette("Set2"))
+plt.title("Payment Method Distribution")
+plt.tight_layout()
+plt.savefig("payment_method.png")
+plt.figure(figsize=(8, 5))
+labels = ['Repeat Users', 'One-Time Users']
+sizes = [repeat_users, total_users - repeat_users]
+colors = ["#4CAF50", "#FFC107"]
+plt.pie(sizes, labels=labels, autopct='%1.1f%%', colors=colors)
+plt.title("User Retention Rate")
+plt.tight_layout()
+plt.savefig("user_retention_pie.png")
+plt.close()
+df['Month_Name'] = df['Month'].apply(lambda x: calendar.month_name[x])
+monthly_revenue = df.groupby('Month_Name')['Revenue'].sum()
+month_order = list(calendar.month_name)[1:]  
+monthly_revenue = monthly_revenue.reindex(month_order).dropna()
+plt.figure(figsize=(10, 6))
+sns.lineplot(x=monthly_revenue.index, y=monthly_revenue.values, marker='o')
+plt.title("Monthly Revenue Trend")
+plt.xlabel("Month")
+plt.ylabel("Revenue (Rs.)")
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.savefig("monthly_revenue.png")
+plt.close()
+df.to_csv("ecommerce_cleaned.csv", index=False)
+print("=== Summary ===")
+print("Total Users:", total_users)
+print("Repeat Users:", repeat_users)
+print("Retention Rate: {:.2f}%".format(retention_rate))
+print("\nTop 5 Categories by Revenue:")
+print(category_revenue.head())
