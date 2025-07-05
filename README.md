@@ -58,7 +58,7 @@ This project analyzes a large e-commerce dataset using **Python** for data analy
 ---
 
 ## Project Structure
-
+```plaintext
 E-commerce-Insights/
 ├── ecommerce_dataset_large.csv         # Dataset
 ├── ecommerce_insights.py               # Python analysis script
@@ -71,6 +71,7 @@ E-commerce-Insights/
 │   └── payment_method.png
 ├── Ecommerce_Insights.pbix             # Power BI dashboard file
 └── README.md
+```
 
 ---
 ## How to Run the Project
