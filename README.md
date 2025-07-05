@@ -8,7 +8,7 @@ This project analyzes a large e-commerce dataset using **Python** for data analy
 
 ## Tools & Technologies
 
-- Python 3.x
+- Python 
 - Pandas, NumPy
 - Matplotlib, Seaborn
 - Power BI Desktop
